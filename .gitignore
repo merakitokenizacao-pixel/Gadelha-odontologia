@@ -1,0 +1,11 @@
+# Só o site vai para o GitHub (repositório público). Versões antigas, prints, materiais da clínica,
+# ferramentas e anotações ficam só neste computador.
+/*
+!/.gitignore
+!/README.md
+!/index.html
+!/assets/
+!/favicon.svg
+!/apple-touch-icon.png
+!/og.jpg
+!/robots.txt
