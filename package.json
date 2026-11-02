@@ -1,0 +1,32 @@
+{
+  "name": "gadelha-odontologia",
+  "version": "27.0.0",
+  "private": true,
+  "description": "Site da Gadelha Odontologia (Lago Sul, Brasília), em Next.js com exportação estática.",
+  "scripts": {
+    "dev": "next dev --port 3910",
+    "build": "next build",
+    "start": "python -m http.server 3911 --directory out",
+    "tipos": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gsap/react": "2.1.2",
+    "@react-three/drei": "10.7.9",
+    "@react-three/fiber": "9.8.2",
+    "@react-three/postprocessing": "3.2.0",
+    "gsap": "3.15.0",
+    "lenis": "1.3.27",
+    "next": "16.2.9",
+    "postprocessing": "6.39.5",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.43",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@types/three": "0.186.0",
+    "typescript": "5.9.3"
+  }
+}

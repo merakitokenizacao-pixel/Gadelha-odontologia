@@ -1,0 +1,768 @@
+/* Gadelha Odontologia · v27 (Next.js). "A luz da entrada": a página inteira fica sobre o creme e a areia
+   do reboco da entrada da clínica (o fundo é uma tela WebGL atrás de tudo, Fundo.tsx); o azul-marinho do
+   nome na parede aparece em painéis de cantos redondos. Hierarquia: títulos em 300, letras apertadas, em
+   duas cores (a afirmação na tinta, a continuação no tom claro); rótulos pequenos e espaçados. */
+
+:root {
+  --tinta: #181d45;
+  --tinta-2: #232a5e;
+  --tinta-txt: #1b2150;
+  --suave: #77735f;
+  --apoio: #57544a;
+  --rotulo: #625e4c;
+  --caqui: #a39d86;
+  --caqui-claro: #cdc6ae;
+  --creme: #f3efe6;
+  --luz: #faf7f0;
+  --areia: #e9e0cd;
+  --linha: rgba(27, 33, 80, 0.12);
+  --sobre-tinta: #f3efe6;
+  --sobre-tinta-2: #a9adca;
+  --linha-tinta: rgba(243, 239, 230, 0.16);
+
+  --largura: 1240px;
+  --margem: clamp(18px, 5vw, 64px);
+  --vao: clamp(16px, 2vw, 28px);
+  --topo: 76px;
+  --secao: clamp(104px, 13vw, 196px);
+  --raio: clamp(22px, 2.4vw, 34px);
+  --curva: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --sai: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--topo) + 8px);
+}
+
+body {
+  margin: 0;
+  background: var(--creme);
+  color: var(--tinta-txt);
+  font-family: var(--fonte), system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+p,
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.pular {
+  position: absolute;
+  left: 16px;
+  top: -60px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--tinta);
+  color: var(--luz);
+}
+
+.pular:focus {
+  top: 12px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--caqui);
+  outline-offset: 3px;
+}
+
+.moldura {
+  width: 100%;
+  max-width: calc(var(--largura) + 2 * var(--margem));
+  margin-inline: auto;
+  padding-inline: var(--margem);
+}
+
+/* ---------- camadas: fundo (atrás), conteúdo, 3D, topo, grão (na frente) ---------- */
+.fundo {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  display: block;
+}
+
+.palco3d {
+  z-index: 6 !important;
+}
+
+.grao {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  /* 0,1: o grão quebra os anéis do degradê do fundo nas telas boas */
+  opacity: 0.1;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.42  0 0 0 0 0.36  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+}
+
+/* ---------- tipografia ---------- */
+.rotulo {
+  margin-bottom: 18px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rotulo);
+}
+
+.rotulo--claro {
+  color: var(--caqui-claro);
+}
+
+.titulo {
+  font-weight: 300;
+  font-size: clamp(2.35rem, 1.05rem + 4.1vw, 4.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.042em;
+  color: var(--tinta-txt);
+  text-wrap: balance;
+}
+
+.titulo__mascara {
+  display: inline;
+}
+
+.titulo--quebra .titulo__mascara {
+  display: block;
+}
+
+.titulo__forte,
+.titulo__suave {
+  display: inline-block;
+}
+
+.titulo__forte {
+  color: var(--tinta-txt);
+}
+
+.titulo__suave {
+  color: var(--suave);
+}
+
+.titulo--claro .titulo__forte {
+  color: var(--sobre-tinta);
+}
+
+.titulo--claro .titulo__suave {
+  color: var(--sobre-tinta-2);
+}
+
+/* letras: -4% só nos títulos grandes; no celular, peso 400 e menos aperto (a Urbanist encosta) */
+@media (max-width: 1099px) {
+  .titulo {
+    letter-spacing: -0.025em;
+  }
+}
+
+@media (max-width: 599px) {
+  .titulo,
+  .frase__titulo,
+  .trat__nome {
+    font-weight: 400;
+    letter-spacing: -0.015em;
+  }
+}
+
+/* ---------- botões ---------- */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 26px;
+  border: 0;
+  border-radius: 999px;
+  font: 500 1rem/1.2 var(--fonte), system-ui, sans-serif;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.25s var(--curva), color 0.25s var(--curva), box-shadow 0.25s var(--curva), transform 0.25s var(--curva);
+}
+
+.botao:active {
+  transform: scale(0.98);
+}
+
+.botao--tinta {
+  background: var(--tinta);
+  color: var(--luz);
+  box-shadow: 0 10px 30px -14px rgba(24, 29, 69, 0.55);
+}
+
+.botao--tinta:hover {
+  background: var(--tinta-2);
+}
+
+.botao--claro {
+  background: var(--luz);
+  color: var(--tinta);
+}
+
+.botao--claro:hover {
+  background: #fff;
+}
+
+.botao--contorno {
+  background: transparent;
+  color: var(--tinta-txt);
+  box-shadow: inset 0 0 0 1px rgba(27, 33, 80, 0.32);
+}
+
+.botao--contorno:hover {
+  box-shadow: inset 0 0 0 1px var(--tinta-txt);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.botao--pequeno {
+  min-height: 40px;
+  padding: 0 18px;
+  font-size: 0.9375rem;
+}
+
+.icone {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.link-seta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}
+
+/* pendências (saem antes de publicar): contorno tracejado com o que falta */
+.pendente {
+  outline: 1px dashed rgba(163, 157, 134, 0.9);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* ---------- painéis azuis ---------- */
+.painel {
+  position: relative;
+  margin-inline: clamp(8px, 1vw, 14px);
+  border-radius: var(--raio);
+  background:
+    radial-gradient(120% 80% at 10% 0%, rgba(54, 63, 132, 0.55) 0%, rgba(54, 63, 132, 0) 55%),
+    radial-gradient(90% 70% at 100% 100%, rgba(163, 157, 134, 0.16) 0%, rgba(163, 157, 134, 0) 60%),
+    var(--tinta);
+  color: var(--sobre-tinta);
+  overflow: clip;
+  isolation: isolate;
+}
+
+/* ---------- topo ---------- */
+.topo {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: var(--topo);
+  transition: background-color 0.35s var(--curva), box-shadow 0.35s var(--curva), color 0.35s var(--curva);
+}
+
+.topo.rolou {
+  background: rgba(246, 242, 234, 0.94);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 1px 0 var(--linha);
+}
+
+.topo.rolou.topo--escuro {
+  background: rgba(24, 29, 69, 0.95);
+  box-shadow: 0 1px 0 var(--linha-tinta);
+  color: var(--sobre-tinta);
+}
+
+.topo--escuro .marca {
+  color: var(--sobre-tinta);
+}
+
+.topo--escuro .botao--tinta {
+  background: var(--sobre-tinta);
+  color: var(--tinta);
+}
+
+.topo__linha {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--tinta-txt);
+  transition: color 0.3s var(--curva);
+}
+
+.marca__simbolo {
+  width: 40px;
+  height: 36px;
+}
+
+.marca__nome {
+  width: 112px;
+  height: 40px;
+}
+
+.menu {
+  margin-left: auto;
+  display: flex;
+  gap: 30px;
+}
+
+.menu a {
+  position: relative;
+  padding: 6px 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.menu a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--curva);
+}
+
+.menu a:hover::after {
+  transform: scaleX(1);
+}
+
+/* ---------- 1. abertura ---------- */
+.abertura {
+  position: relative;
+  min-height: calc(100svh - var(--topo));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 3.6vh, 40px);
+  padding-block: clamp(24px, 4vh, 48px) clamp(88px, 13vh, 128px);
+  text-align: center;
+}
+
+/* left (e não translate): um transform faria desta caixa a referência do position: fixed da espiral */
+.abertura__lugar {
+  --l: min(64vw, calc((100svh - var(--topo) - 280px) * 1.106), 430px);
+  position: relative;
+  left: calc(var(--l) * 0.05);
+  width: var(--l);
+  aspect-ratio: 35.5 / 32.09;
+  color: var(--caqui);
+}
+
+.abertura__espiral {
+  width: 100%;
+  height: 100%;
+}
+
+.abertura__local {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--rotulo);
+}
+
+.abertura__rolar {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(24px, 4vh, 40px);
+  width: 1px;
+  height: 48px;
+  background: var(--linha);
+  overflow: hidden;
+}
+
+.abertura__rolar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 45%;
+  background: var(--rotulo);
+  transform: translateY(-100%);
+}
+
+.espiral {
+  overflow: visible;
+}
+
+.espiral path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--traco, 0.12);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 0;
+}
+
+.espiral--grande {
+  --traco: 0.11;
+}
+
+.espiral .espiral__azul {
+  stroke: var(--tinta-txt);
+  stroke-dashoffset: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .espiral path {
+    stroke-dashoffset: 1;
+  }
+
+  .js .espiral--grande .espiral__traco {
+    animation: desenha 2.8s var(--curva) 0.35s forwards;
+  }
+
+  .js .abertura__local {
+    opacity: 0;
+    animation: aparece 0.9s var(--curva) 2.4s forwards;
+  }
+
+  .js .abertura__rolar {
+    opacity: 0;
+    animation: aparece 0.6s var(--curva) 3.1s forwards;
+  }
+
+  .js .abertura__rolar::after {
+    animation: rolar 2.4s var(--curva) 3.4s infinite;
+  }
+}
+
+@keyframes desenha {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes aparece {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rolar {
+  to {
+    transform: translateY(230%);
+  }
+}
+
+.voa:not(.pousou) .topo .botao--tinta,
+.js.cta-antes .topo:not(.topo--escuro) .botao--tinta {
+  background: transparent;
+  color: var(--tinta-txt);
+  box-shadow: inset 0 0 0 1px var(--tinta-txt);
+}
+
+.voa .abertura__espiral {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 45;
+  transform-origin: 0 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.voa .topo .marca__simbolo {
+  opacity: 0;
+}
+
+/* ---------- 2. a frase ---------- */
+.frase {
+  padding-block: clamp(56px, 9vw, 120px) var(--secao);
+}
+
+.frase__titulo {
+  font-weight: 300;
+  font-size: clamp(2.8rem, 1.1rem + 5.4vw, 6.3rem);
+  line-height: 1;
+  letter-spacing: -0.046em;
+  max-width: 18ch;
+}
+
+/* a frase numa cor só: apagada a 20% antes de acender */
+.frase__titulo {
+  color: var(--tinta-txt);
+}
+
+.palavra {
+  opacity: calc(0.2 + 0.8 * var(--luz, 1));
+  transition: opacity 0.3s linear;
+}
+
+.frase__apoio {
+  margin-top: clamp(26px, 3vw, 40px);
+  font-size: clamp(1.125rem, 1rem + 0.4vw, 1.3rem);
+  color: var(--apoio);
+}
+
+.frase__apoio a {
+  color: var(--tinta-txt);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.frase__acao {
+  margin-top: clamp(28px, 3.2vw, 44px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 22px;
+}
+
+.frase__nota {
+  font-size: 0.9375rem;
+  color: var(--apoio);
+}
+
+/* ---------- 3. experiência ---------- */
+.experiencia {
+  padding-bottom: var(--secao);
+}
+
+.experiencia__grade {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--vao);
+  row-gap: 64px;
+  align-items: end;
+}
+
+.experiencia__trinta {
+  grid-column: 1 / span 7;
+}
+
+.experiencia__pacientes {
+  grid-column: 9 / span 4;
+}
+
+.numero-desenhado {
+  width: clamp(170px, 21vw, 290px);
+  height: auto;
+  color: var(--tinta-txt);
+  overflow: visible;
+}
+
+.numero-desenhado path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 0;
+}
+
+.numero-desenhado--mil {
+  width: clamp(150px, 15vw, 210px);
+}
+
+.numero-desenhado--mil path {
+  stroke-width: 2.4;
+}
+
+.numero-desenhado .pingo {
+  fill: currentColor;
+  stroke: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .numero-desenhado path {
+    stroke-dashoffset: 1;
+  }
+
+  .js .visivel .numero-desenhado path {
+    animation: desenha 1.5s var(--curva) 0.2s forwards;
+  }
+
+  .js .visivel .numero-desenhado path + path {
+    animation-delay: 0.9s;
+  }
+
+  .js .visivel .numero-desenhado--mil path {
+    animation-duration: 0.9s;
+    animation-delay: 0.3s;
+  }
+
+  .js .visivel .numero-desenhado--mil path + path {
+    animation-delay: 0.55s;
+  }
+
+  .js .visivel .numero-desenhado--mil path + path + path {
+    animation-delay: 0.8s;
+  }
+
+  .js .visivel .numero-desenhado--mil path + path + path + path {
+    animation-delay: 1.05s;
+  }
+
+  .js .visivel .numero-desenhado--mil path:last-child {
+    animation-delay: 1.25s;
+  }
+
+  .js .numero-desenhado .pingo {
+    opacity: 0;
+  }
+
+  .js .visivel .numero-desenhado .pingo {
+    animation: aparece 0.3s var(--curva) 1.2s forwards;
+  }
+}
+
+.experiencia__titulo {
+  margin-top: clamp(22px, 2.6vw, 36px);
+  font-size: clamp(2rem, 1.1rem + 2.8vw, 3.4rem);
+  max-width: 17ch;
+}
+
+.experiencia__areas {
+  margin-top: 22px;
+  font-size: 0.9375rem;
+  color: var(--apoio);
+}
+
+.experiencia__area {
+  white-space: nowrap;
+}
+
+.experiencia__areas i {
+  font-style: normal;
+  color: var(--caqui);
+}
+
+.experiencia__mil {
+  display: inline-block;
+}
+
+.experiencia__cerca {
+  margin-bottom: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rotulo);
+}
+
+.experiencia__texto {
+  margin-top: 14px;
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+.experiencia .link-seta {
+  margin-top: 26px;
+  font-size: 0.9375rem;
+  color: var(--tinta-txt);
+}
+
+@media (max-width: 899px) {
+  .experiencia__trinta,
+  .experiencia__pacientes {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 899px) {
+  :root {
+    --topo: 64px;
+  }
+
+  .menu {
+    display: none;
+  }
+
+  .topo__linha {
+    justify-content: space-between;
+  }
+
+  .marca__simbolo {
+    width: 34px;
+    height: 31px;
+  }
+
+  .marca__nome {
+    width: 96px;
+    height: 34px;
+  }
+
+  .abertura__lugar {
+    --l: min(66vw, calc((100svh - var(--topo) - 240px) * 1.106), 360px);
+  }
+
+  .espiral--grande {
+    --traco: 0.19;
+  }
+}
+
+/* o "º" na fonte do sistema, menor (o da Urbanist tem o tamanho de um "o") */
+.ord {
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.8em;
+}
+
+/* a frase no celular: menor e com as linhas equilibradas (eram quatro, com "inteira." sozinha) */
+@media (max-width: 599px) {
+  .frase__titulo {
+    font-size: 2.4rem;
+    text-wrap: balance;
+  }
+}

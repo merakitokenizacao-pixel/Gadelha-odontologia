@@ -1,11 +1,14 @@
-# Só o site vai para o GitHub (repositório público). Versões antigas, prints, materiais da clínica,
-# ferramentas e anotações ficam só neste computador.
+# Só o site vai para o GitHub (repositório público): o projeto da v27 (Next.js) e o que a página publica.
+# Ficam só neste computador: materiais/ (fotos originais e documentos da clínica), docs/ (prints e
+# anotações), versoes/, ferramentas/, out/, .next/, node_modules/ e o HTML da v26 (na raiz; está no
+# histórico do repositório, no commit 29d8dcc).
 /*
 !/.gitignore
 !/README.md
-!/index.html
-!/assets/
-!/favicon.svg
-!/apple-touch-icon.png
-!/og.jpg
-!/robots.txt
+!/src/
+!/public/
+!/package.json
+!/package-lock.json
+!/next.config.ts
+!/tsconfig.json
+!/next-env.d.ts
