@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { COPY } from "@/lib/conteudo";
 import { limita, suave } from "@/lib/movimento";
+import { comOrdinal } from "@/lib/ordinal";
 import { alturaTopo, naMedida, naRolagem } from "@/lib/rolagem";
 import { Titulo } from "./Titulo";
 
@@ -141,7 +142,7 @@ export function Clinica() {
                     <span className="passeio__num">0{i + 1}</span> {p.nome}
                   </p>
                   <p className="passeio__frase">
-                    <span className="titulo__forte">{p.forte}</span> <span className="titulo__suave">{p.suave}</span>
+                    <span className="titulo__forte">{comOrdinal(p.forte)}</span> <span className="titulo__suave">{p.suave}</span>
                   </p>
                   <span className="passeio__barra">
                     <i />

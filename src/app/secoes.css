@@ -275,10 +275,17 @@
   transform: rotate(45deg);
 }
 
-.vitrine__seta:hover:not(:disabled),
 .vitrine__seta.convida {
   background: var(--tinta);
   color: var(--luz);
+}
+
+/* só com mouse: no toque, o "hover" fica preso e a seta parece marcada depois de tocada */
+@media (hover: hover) {
+  .vitrine__seta:hover:not(:disabled) {
+    background: var(--tinta);
+    color: var(--luz);
+  }
 }
 
 .trat {
@@ -445,6 +452,33 @@
   font-size: 0.9375rem;
   color: var(--apoio);
   max-width: 42ch;
+}
+
+/* janela baixa de computador (notebook de 1366 × 768): sem isto, o botão da Ortodontia ficava cortado */
+@media (min-width: 900px) and (max-height: 719px) {
+  .vitrine--rolagem .trat .trat__texto {
+    padding-top: 6px;
+  }
+
+  .vitrine--rolagem .trat__resumo {
+    margin-top: 8px;
+  }
+
+  .vitrine--rolagem .trat__rotulo {
+    margin-top: 14px;
+  }
+
+  .vitrine--rolagem .trat__passos li {
+    padding: 6px 0;
+  }
+
+  .vitrine--rolagem .trat__nota {
+    margin-top: 6px;
+  }
+
+  .vitrine--rolagem .trat__texto .botao {
+    margin-top: 14px;
+  }
 }
 
 .trat__texto .botao {

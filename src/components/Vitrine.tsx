@@ -152,7 +152,9 @@ export function Vitrine() {
       laco = requestAnimationFrame(passo);
     };
     const irCarrossel = (i: number) => {
-      trilho.scrollTo({ left: paineis[i].getBoundingClientRect().left - paineis[0].getBoundingClientRect().left + trilho.scrollLeft, behavior: calmo ? "auto" : "smooth" });
+      // a distância entre os dois painéis já é a posição certa, em qualquer ponto da rolagem: somar a rolagem
+      // atual passava do fim, e as abas e as setas não voltavam
+      trilho.scrollTo({ left: paineis[i].getBoundingClientRect().left - paineis[0].getBoundingClientRect().left, behavior: calmo ? "auto" : "smooth" });
     };
     const lerCarrossel = () => {
       const i = limita(Math.round(trilho.scrollLeft / passoLateral()), 0, paineis.length - 1);
@@ -314,7 +316,7 @@ export function Vitrine() {
                         {t.nome}
                       </h3>
                       <p className="trat__resumo">{t.resumo}</p>
-                      <p className="trat__paraquem">{t.paraQuem}</p>
+                      {t.paraQuem ? <p className="trat__paraquem">{t.paraQuem}</p> : null}
                       <p className="trat__rotulo">{t.rotuloPassos}</p>
                       <ol className="trat__passos">
                         {t.passos.map((p) => (
@@ -325,11 +327,7 @@ export function Vitrine() {
                           </li>
                         ))}
                       </ol>
-                      {t.nota ? (
-                        <p className="trat__nota pendente" data-pendente="a clínica explicar o que é a técnica BFO">
-                          {t.nota}
-                        </p>
-                      ) : null}
+                      {t.nota ? <p className="trat__nota">{t.nota}</p> : null}
                       <a className="botao botao--tinta" href={LINKS.zap(t.mensagem)} target="_blank" rel="noopener">
                         <Icone nome="i-whatsapp" />
                         <span>

@@ -29,14 +29,15 @@ export function Abertura() {
     const azul = espiral.querySelector<SVGPathElement>(".espiral__azul")!;
     const orfaos = orfaosRef.current ? [...orfaosRef.current.children] as HTMLElement[] : [];
     let a = { x: 0, y: 0, w: 1, h: 1 };
-    let u0 = 0.11;
+    let u0 = 0.16;
     let acelerou = false;
 
     const mede = () => {
       traco.style.strokeWidth = "";
       azul.style.strokeWidth = "";
-      u0 = parseFloat(getComputedStyle(traco).strokeWidth) || 0.11;
       const r = lugar.getBoundingClientRect();
+      // o traço nunca fica abaixo de 1,4 px: numa tela de computador comum, mais fino que isso ele some no creme
+      u0 = Math.max(parseFloat(getComputedStyle(traco).strokeWidth) || 0.16, (1.4 * 35.5) / Math.max(r.width, 1));
       a = { x: r.left, y: r.top + scrollY, w: r.width, h: r.height };
       raiz.classList.add("voa");
       espiral.style.width = `${a.w}px`;

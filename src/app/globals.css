@@ -4,6 +4,7 @@
    duas cores (a afirmação na tinta, a continuação no tom claro); rótulos pequenos e espaçados. */
 
 :root {
+  color-scheme: only light;
   --tinta: #181d45;
   --tinta-2: #232a5e;
   --tinta-txt: #1b2150;
@@ -38,6 +39,8 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
   scroll-padding-top: calc(var(--topo) + 8px);
 }
 
@@ -59,6 +62,12 @@ svg {
 }
 
 a {
+  color: inherit;
+}
+
+/* o padrão do botão muda de um sistema para outro (no iPhone, o texto sai azul) */
+button {
+  font: inherit;
   color: inherit;
 }
 
@@ -455,7 +464,7 @@ h3 {
 }
 
 .espiral--grande {
-  --traco: 0.11;
+  --traco: 0.16;
 }
 
 .espiral .espiral__azul {
@@ -463,26 +472,39 @@ h3 {
   stroke-dashoffset: 1;
 }
 
+/* A espiral grande se desenha para todo mundo, inclusive com "reduzir movimento" ligado: é um traço que não
+   desloca nada na tela. Começa com a classe "abre" (layout.tsx), e num ritmo constante: com a curva antiga,
+   três quartos do traço saíam no primeiro segundo. */
+.js .espiral--grande .espiral__traco {
+  stroke-dashoffset: 1;
+}
+
+.js.abre .espiral--grande .espiral__traco {
+  animation: desenha 2.8s cubic-bezier(0.4, 0.15, 0.45, 0.95) 0.35s forwards;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .js .espiral path {
     stroke-dashoffset: 1;
   }
 
-  .js .espiral--grande .espiral__traco {
-    animation: desenha 2.8s var(--curva) 0.35s forwards;
-  }
-
   .js .abertura__local {
     opacity: 0;
+  }
+
+  .js.abre .abertura__local {
     animation: aparece 0.9s var(--curva) 2.4s forwards;
   }
 
   .js .abertura__rolar {
     opacity: 0;
+  }
+
+  .js.abre .abertura__rolar {
     animation: aparece 0.6s var(--curva) 3.1s forwards;
   }
 
-  .js .abertura__rolar::after {
+  .js.abre .abertura__rolar::after {
     animation: rolar 2.4s var(--curva) 3.4s infinite;
   }
 }
@@ -537,6 +559,7 @@ h3 {
   line-height: 1;
   letter-spacing: -0.046em;
   max-width: 18ch;
+  text-wrap: balance;
 }
 
 /* a frase numa cor só: apagada a 20% antes de acender */

@@ -15,8 +15,8 @@ export function Tres() {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const ric = (window as unknown as { requestIdleCallback?: (f: () => void, o?: object) => number }).requestIdleCallback?.bind(window);
     const ocioso = (f: () => void) => (ric ? ric(f, { timeout: 1500 }) : window.setTimeout(f, 200));
-    // a espiral leva ~3,2 s para se desenhar
-    const t = window.setTimeout(() => ocioso(liberaTres), 3300);
+    // a espiral leva ~3,2 s para se desenhar, a contar da primeira pintura
+    const t = window.setTimeout(() => ocioso(liberaTres), 3800);
     const rolou = () => {
       if (scrollY > innerHeight * 0.25) liberaTres();
     };

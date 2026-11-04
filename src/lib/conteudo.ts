@@ -9,7 +9,7 @@ export const LINKS = {
   telefone: "tel:+556137115511",
   instagram: "https://www.instagram.com/gadelhaodontologia/",
   email: "mailto:odontogadelha@gmail.com",
-  maps: "https://www.google.com/maps/search/?api=1&query=SHIS%20QI%209%2F11%20Bloco%20A%20Loja%2012%2C%20Lago%20Sul%2C%20Bras%C3%ADlia%20-%20DF%2C%2071625-015",
+  maps: "https://maps.app.goo.gl/tLk5viHetdxAeN9M9",
   waze: "https://waze.com/ul?q=SHIS%20QI%209%2F11%20Bloco%20A%2C%20Lago%20Sul%2C%20Bras%C3%ADlia&navigate=yes",
   zap,
 };
@@ -24,7 +24,7 @@ export type Tratamento = {
   nome: string;
   curto: string;
   resumo: string;
-  paraQuem: string;
+  paraQuem?: string;
   passos: [string, string, string];
   // onde cada passo começa no filme (0 a 1)
   tempos: [number, number, number];
@@ -39,17 +39,18 @@ export type Tratamento = {
 export const COPY = {
   abertura: { local: "Lago Sul, Brasília" },
   frase: {
-    titulo: ["Do aparelho ao implante,", "para a família inteira."] as Titulo,
-    apoio: ["Na ", "QI 9/11 do Lago Sul", ", com estacionamento público."],
+    // espaço que não quebra em "família inteira,": a vírgula não fica sozinha numa linha
+    titulo: ["Cuidar do sorriso da família inteira,", "do aparelho ao implante."] as Titulo,
+    apoio: ["Estamos na ", "QI 9/11 do Lago Sul", " (com estacionamento fácil)."],
     cta: "Agendar pelo WhatsApp",
     nota: "A recepção responde em horário comercial.",
   },
   experiencia: {
-    titulo: ["anos de experiência.", "É o que um tratamento complexo pede."] as Titulo,
-    areas: ["Ortodontia", "Cirurgia", "Implante e reabilitação oral", "Profilaxia e prevenção"],
+    titulo: ["anos de experiência.", "Porque um tratamento complexo exige profissionalismo e segurança."] as Titulo,
+    areas: ["Ortodontia", "Cirurgia", "Implantes", "Prevenção e limpeza"],
     cerca: "cerca de",
     pacientes: "pacientes atendidos.",
-    retorno: "Já foi paciente? Marque seu retorno",
+    retorno: "Já é paciente? Clique aqui para marcar seu retorno",
   },
   tratamentos: {
     rotulo: "Tratamentos",
@@ -61,8 +62,8 @@ export const COPY = {
         numero: "01",
         nome: "Ortodontia",
         curto: "Ortodontia",
-        resumo: "Alinhadores transparentes e aparelho, para adolescentes e adultos.",
-        paraQuem: "Para quem tem dentes tortos, espaçados ou a mordida desalinhada.",
+        resumo: "Alinhadores transparentes e aparelhos fixos para todas as idades.",
+        paraQuem: "Ideal para alinhar os dentes e acertar a mordida com mais conforto.",
         passos: [
           "Planejamos no computador o caminho de cada dente.",
           "Cada alinhador move os dentes um pouco.",
@@ -75,7 +76,7 @@ export const COPY = {
           { texto: "o seguinte", de: 0.665, ate: 0.8, x: "50%", y: "64%" },
           { texto: "e assim até o fim do plano", de: 0.88, ate: 0.995, x: "50%", y: "64%" },
         ],
-        nota: "Mais de 10 anos na técnica BFO e em tratamentos híbridos.",
+        nota: "Mais de 10 anos de experiência com a técnica BFO (Ortodontia Fixa Sem Brackets).",
         rotuloPassos: "Passo a passo com alinhadores",
         cta: "Agendar avaliação de ortodontia",
         mensagem: "Olá! Gostaria de agendar uma avaliação de ortodontia.",
@@ -85,8 +86,7 @@ export const COPY = {
         numero: "02",
         nome: "Estética do sorriso",
         curto: "Estética",
-        resumo: "Facetas e restaurações para devolver forma e cor aos dentes.",
-        paraQuem: "Para quem tem dentes escurecidos, lascados ou desgastados.",
+        resumo: "Facetas e restaurações que devolvem a cor e a harmonia natural do seu sorriso, corrigindo pequenas imperfeições.",
         passos: [
           "Avaliamos forma, cor e proporção de cada dente.",
           "Na faceta, colamos uma lâmina fina na frente do dente.",
@@ -110,8 +110,7 @@ export const COPY = {
         numero: "03",
         nome: "Prótese e implantes",
         curto: "Implantes",
-        resumo: "Implante, coroa e prótese para repor um dente ou vários.",
-        paraQuem: "Para quem perdeu algum dente ou usa uma prótese que incomoda.",
+        resumo: "Implantes e próteses planejados para repor dentes perdidos, devolver a firmeza na mastigação e trazer conforto de volta.",
         passos: [
           "Colocamos o implante no osso, no lugar da raiz.",
           "Esperamos a cicatrização, para o osso se unir ao implante.",
@@ -135,8 +134,7 @@ export const COPY = {
         numero: "04",
         nome: "Profilaxia e prevenção",
         curto: "Prevenção",
-        resumo: "Limpeza e revisão periódica, para a família inteira.",
-        paraQuem: "Para quem está há algum tempo sem ir ao dentista.",
+        resumo: "Limpeza detalhada e check-up preventivo para manter a saúde bucal da família sempre em dia.",
         passos: [
           "Removemos a placa e o tártaro.",
           "Polimos os dentes.",
@@ -158,34 +156,35 @@ export const COPY = {
   },
   tecnologia: {
     rotulo: "Tecnologia",
-    titulo: ["Você vê a simulação do seu sorriso", "antes de começar."] as Titulo,
+    // o documento da clínica diz "Veja o resultado do seu tratamento": "simulação" evita prometer resultado (CFO)
+    titulo: ["Veja a simulação do seu tratamento", "antes mesmo de começar."] as Titulo,
     itens: [
-      { n: "01", forte: "Escaneamos seus dentes.", apoio: "O scanner cria um modelo digital da sua boca." },
-      { n: "02", forte: "Simulamos o tratamento.", apoio: "Na tela, você vê até onde o plano leva cada dente." },
-      { n: "03", forte: "Imprimimos os modelos em 3D.", apoio: "A impressora fica aqui na clínica." },
+      { n: "01", forte: "Escaneamento digital:", apoio: "Criamos um modelo tridimensional exato da sua arcada, sem necessidade de moldagem em gesso." },
+      { n: "02", forte: "Simulação realista:", apoio: "Mostramos na tela como seus dentes vão se movimentar e o resultado esperado." },
+      { n: "03", forte: "Impressão 3D na clínica:", apoio: "Agilidade e precisão com nossa impressora 3D própria." },
     ],
   },
   clinica: {
     rotulo: "A clínica",
-    titulo: ["Pode entrar.", "Antes de vir, veja como é por dentro."] as Titulo,
+    titulo: ["Sinta-se em casa.", "Conheça nosso espaço antes de vir nos visitar."] as Titulo,
     paradas: [
-      { nome: "A entrada", forte: "É só procurar o nosso nome", suave: "ao lado da porta de vidro, no primeiro andar do Bloco A." },
-      { nome: "A recepção", forte: "Quem responde o seu WhatsApp", suave: "fica aqui, neste balcão." },
-      { nome: "O consultório", forte: "A luz do dia entra pela janela.", suave: "É aqui que cuidamos de você, uma etapa de cada vez." },
+      { nome: "A entrada", forte: "Estamos no 1º andar do Bloco A.", suave: "É só procurar nossa fachada." },
+      { nome: "A recepção", forte: "Um ambiente aconchegante", suave: "onde nossa equipe te recebe com todo o cuidado." },
+      { nome: "O consultório", forte: "Iluminado por luz natural,", suave: "preparado para cuidar de você com calma e conforto." },
     ],
   },
   onde: {
     rotulo: "Onde estamos",
-    titulo: ["Lago Sul, QI 9/11.", "Fácil de estacionar."] as Titulo,
+    titulo: ["Lago Sul, QI 9/11.", "Local de fácil acesso e estacionamento tranquilo."] as Titulo,
     endereco: ["SHIS QI 9/11, Bloco A, Loja 12, 1º andar", "Lago Sul, Brasília-DF"],
     estacionamento: "Estacionamento público",
     horario: "Horário: a confirmar com a clínica",
-    convenios: "Convênios STM e APEX",
+    convenios: "Atendimento particular e convênios STM e APEX",
     whatsapp: "(61) 99902-5511",
     telefone: "(61) 3711-5511",
   },
   rodape: {
-    titulo: ["Primeira consulta ou retorno,", "basta uma mensagem."] as Titulo,
+    titulo: ["Para uma avaliação ou retorno,", "é só mandar uma mensagem."] as Titulo,
     cta: "Agendar pelo WhatsApp",
     nota: "A recepção responde em horário comercial.",
     rt: { nome: "Dr. Flávio Paiva Gadelha", cargo: "Cirurgião-dentista", funcao: "Responsável técnico", cro: "CRO-DF 3751" },
