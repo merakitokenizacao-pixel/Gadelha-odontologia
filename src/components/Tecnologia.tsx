@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { COPY } from "@/lib/conteudo";
 import { limita, suave } from "@/lib/movimento";
 import { naMedida, naRolagem } from "@/lib/rolagem";
-import { pedeDesenho } from "@/lib/tres";
+import { ehToque, marcaPerto, pedeDesenho } from "@/lib/tres";
 import { FILMES } from "@/tres/filme";
 import { Cena } from "./Cena";
 import { Titulo } from "./Titulo";
@@ -95,10 +95,17 @@ export function Tecnologia() {
     );
     caixas.forEach((c) => olho.observe(c));
     quadro = requestAnimationFrame(laco);
+    // no celular e no tablet, as telas 3D dos laços só existem com o painel perto da tela (olhando a caixa de
+    // fora: o recorte do painel esconderia os cartões até a linha de luz passar)
+    const idsLaco = Object.keys(LACO);
+    const olhoPerto = new IntersectionObserver(([e]) => idsLaco.forEach((id) => marcaPerto(id, e.isIntersecting)), { rootMargin: "15% 0px" });
+    if (ehToque() && painel.parentElement) olhoPerto.observe(painel.parentElement);
     return () => {
       fimRolagem();
       fimMedida();
       olho.disconnect();
+      olhoPerto.disconnect();
+      idsLaco.forEach((id) => marcaPerto(id, false));
       cancelAnimationFrame(quadro);
     };
   }, []);

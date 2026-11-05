@@ -5,7 +5,7 @@ import { COPY, LINKS } from "@/lib/conteudo";
 import { estadoFundo } from "@/lib/fundo";
 import { limita, suave } from "@/lib/movimento";
 import { alturaTopo, naMedida, naRolagem, rolaAte } from "@/lib/rolagem";
-import { pedeDesenho } from "@/lib/tres";
+import { ehToque, marcaPerto, pedeDesenho } from "@/lib/tres";
 import { FILMES } from "@/tres/filme";
 import { Cena } from "./Cena";
 import { Icone } from "./Marca";
@@ -40,6 +40,13 @@ export function Vitrine() {
     let modo: "rolagem" | "carrossel" | null = null;
     let atual = -1;
 
+    // no celular e no tablet, só o tratamento da vez e os vizinhos têm tela 3D, e só com a vitrine perto da tela
+    const toque = ehToque();
+    let vitrinePerto = false;
+    const atualizaPerto = () => {
+      if (toque) ids.forEach((id, j) => marcaPerto(id, vitrinePerto && Math.abs(j - Math.max(atual, 0)) <= 1));
+    };
+
     const acende = (i: number, p: number) => {
       let k = 0;
       tempos[i].forEach((t, j) => {
@@ -63,6 +70,7 @@ export function Vitrine() {
       setas[0].disabled = i === 0;
       setas[1].disabled = i === paineis.length - 1;
       setas[1].classList.remove("convida");
+      atualizaPerto();
     };
     const passoLateral = () => paineis[1].getBoundingClientRect().left - paineis[0].getBoundingClientRect().left;
 
@@ -229,7 +237,10 @@ export function Vitrine() {
       limpa.push(() => b.removeEventListener("click", vai));
     });
     const noTrilho = () => {
-      if (modo === "carrossel") lerCarrossel();
+      if (modo !== "carrossel") return;
+      lerCarrossel();
+      // numa janela estreita no computador, a tela 3D é presa à janela: o desenho acompanha o trilho a cada quadro
+      pedeDesenho();
     };
     trilho.addEventListener("scroll", noTrilho, { passive: true });
     const foco = (e: FocusEvent) => {
@@ -250,6 +261,15 @@ export function Vitrine() {
       { threshold: [0, 0.6] },
     );
     paineis.forEach((p) => olho.observe(p.querySelector(".trat__arte")!));
+    const olhoPerto = new IntersectionObserver(
+      ([e]) => {
+        vitrinePerto = e.isIntersecting;
+        atualizaPerto();
+      },
+      // chega com folga por baixo (a cena tem tempo de ficar pronta) e larga logo que passa
+      { rootMargin: "10% 0px 40% 0px" },
+    );
+    if (toque) olhoPerto.observe(vitrine);
     const fimRolagem = naRolagem(() => {
       if (modo === "rolagem") lerRolagem();
     });
@@ -262,6 +282,8 @@ export function Vitrine() {
       trilho.removeEventListener("scroll", noTrilho);
       trilho.removeEventListener("focusin", foco);
       olho.disconnect();
+      olhoPerto.disconnect();
+      ids.forEach((id) => marcaPerto(id, false));
       fimRolagem();
       fimMedida();
       mq.removeEventListener("change", aplicaModo);

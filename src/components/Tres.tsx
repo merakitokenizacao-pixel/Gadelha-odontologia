@@ -2,14 +2,16 @@
 
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
-import { liberaTres, useTresLiberado } from "@/lib/tres";
+import { liberaTres, useTresLiberado, useToque } from "@/lib/tres";
 
 // Carrega a tela 3D (three.js) só depois que a espiral se desenha, no momento ocioso, ou na primeira
 // rolagem. Até lá (e sempre, para quem pede menos movimento), cada desenho mostra o quadro final.
+// No celular e no tablet não há tela única: cada cena leva a dela (Cena.tsx).
 const Palco = dynamic(() => import("@/tres/Palco").then((m) => m.Palco), { ssr: false });
 
 export function Tres() {
   const liberado = useTresLiberado();
+  const toque = useToque();
 
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -27,5 +29,5 @@ export function Tres() {
     };
   }, []);
 
-  return liberado ? <Palco /> : null;
+  return liberado && !toque ? <Palco /> : null;
 }

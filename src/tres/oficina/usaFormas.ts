@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import * as THREE from "three";
-import { marcaCenaPronta } from "@/lib/tres";
 import { FORMAS_CENA, type Formas } from "./formas";
 import type { Serial } from "./serial";
 
@@ -61,20 +60,17 @@ export function pedeFormas(cena: string): Promise<Formas> {
   return promessa;
 }
 
-export function useFormas(cena: string, aviso?: string) {
+export function useFormas(cena: string) {
   const [formas, setFormas] = useState<Formas | null>(null);
   useEffect(() => {
     let vivo = true;
     pedeFormas(cena).then((f) => {
-      if (!vivo) return;
-      setFormas(f);
-      // um quadro depois, para a cena já ter sido desenhada
-      if (aviso) requestAnimationFrame(() => requestAnimationFrame(() => marcaCenaPronta(aviso)));
+      if (vivo) setFormas(f);
     });
     return () => {
       vivo = false;
     };
-  }, [cena, aviso]);
+  }, [cena]);
   return formas;
 }
 

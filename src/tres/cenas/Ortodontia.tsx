@@ -10,6 +10,7 @@ import { FILMES, sobe, trecho } from "../filme";
 import { alinhador, esmalte } from "../materiais";
 import { poseOrto, vagasOrto } from "../oficina/orto";
 import { uma, useFormas, varias } from "../oficina/usaFormas";
+import { Preparo } from "../Preparo";
 
 // T1 · Ortodontia. A arcada de cima, de pré-molar a pré-molar, vista de frente e de baixo (uns 30° abaixo
 // das bordas), como quem olha o sorriso.
@@ -37,7 +38,7 @@ const NORMAIS = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide });
 const SOME_ORTO: SomeGengiva = { y: [6.2, 9.0], r: [34.0, 38.0], centroZ: -8 };
 
 export function CenaOrtodontia({ p: fixo, vista }: { p?: number; vista?: "oclusal" | "semgengiva" | "bandeja" }) {
-  const formas = useFormas("orto", "orto");
+  const formas = useFormas("orto");
   const vagas = useMemo(vagasOrto, []);
   const barato = useMemo(() => typeof window !== "undefined" && matchMedia("(max-width: 899px), (pointer: coarse)").matches, []);
   const mat = useMemo(
@@ -203,12 +204,14 @@ export function CenaOrtodontia({ p: fixo, vista }: { p?: number; vista?: "oclusa
             ref={(e) => {
               bandejas.current[j] = e;
             }}
+            geometry={varias(formas, "alinhadores")[j]}
             material={vista === "bandeja" ? NORMAIS : m}
             visible={false}
             renderOrder={2}
           />
         ))}
       </group>
+      <Preparo id="orto" />
     </>
   );
 }

@@ -10,6 +10,7 @@ import { FILMES, janela, mix, sobe, trecho } from "../filme";
 import { aco, esmalte, gengiva } from "../materiais";
 import { filaProfilaxia } from "../oficina/formas";
 import { uma, useFormas, varias } from "../oficina/usaFormas";
+import { Preparo } from "../Preparo";
 
 // T4 · Profilaxia e prevenção. Os seis dentes da frente de baixo, vistos de frente e um pouco de cima.
 // 1) junto à gengiva, o tártaro (crostas ásperas, bege) e a película fosca da placa;
@@ -43,7 +44,7 @@ function textura(): THREE.Texture {
 
 export function CenaProfilaxia({ p: fixo }: { p?: number }) {
   // as formas vêm da oficina (worker); a fila (posições) é calculada aqui mesmo
-  const formas = useFormas("profilaxia", "profilaxia");
+  const formas = useFormas("profilaxia");
   const fila = useMemo(filaProfilaxia, []);
   const desv = useMemo(() => ({ y: new THREE.Vector2(-6.4, -4.6), x: new THREE.Vector2(15.5, 19.5) }), []);
   // as raízes continuam dentro da gengiva, mas não descem até onde ela se desfaz
@@ -279,6 +280,7 @@ export function CenaProfilaxia({ p: fixo }: { p?: number }) {
           <mesh geometry={uma(formas, "taca")!} material={mat.taca} castShadow />
         </group>
       </group>
+      <Preparo id="profilaxia" />
     </>
   );
 }

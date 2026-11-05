@@ -11,6 +11,7 @@ import { FILMES, janela, mix, sobe } from "../filme";
 import { dentina, esmalte, gengiva, porcelana, titanio } from "../materiais";
 import { IMPLANTE, topoGengivaImplante, topoOssoImplante } from "../oficina/formas";
 import { uma, useFormas } from "../oficina/usaFormas";
+import { Preparo } from "../Preparo";
 
 // T3 · Prótese e implantes. Um trecho reto da arcada de baixo, cortado ao meio como em livro de anatomia:
 // a gengiva por cima, o osso trabecular no corte (e nas laterais do trecho), dois molares vizinhos com as
@@ -37,7 +38,7 @@ const RAIZES: Raiz[] = [-VIZINHO, VIZINHO].flatMap((cx) => [
 ]);
 
 export function CenaImplante({ p: fixo }: { p?: number }) {
-  const formas = useFormas("implante", "implante");
+  const formas = useFormas("implante");
   const plano = useMemo(planoDoCorte, []);
   const desv = useMemo(() => ({ y: new THREE.Vector2(...DESVANECE), x: new THREE.Vector2(400, 500) }), []);
   const mat = useMemo(() => {
@@ -131,6 +132,7 @@ export function CenaImplante({ p: fixo }: { p?: number }) {
         <mesh ref={pilar} geometry={uma(formas, "pilar")!} material={mat.titanio} position={[0, 13, 0]} castShadow />
         <mesh ref={coroa} geometry={uma(formas, "coroa")!} material={mat.porcelana} position={[0, 17, 0]} />
       </group>
+      <Preparo id="implante" />
     </>
   );
 }

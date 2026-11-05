@@ -262,7 +262,7 @@ export function desvaneceEmbaixo<T extends THREE.Material>(m: T, d: Desvanece): 
 // O contrário: a parte de cima some aos poucos (a película da placa, que não termina numa linha reta).
 export function desvaneceEmCima<T extends THREE.Material>(m: T, y0: number, y1: number): T {
   m.transparent = true;
-  encadeia(m, `cima-${y0}-${y1}`, (sh) => {
+  encadeia(m, "cima", (sh) => {
     sh.uniforms.uCima = { value: new THREE.Vector2(y0, y1) };
     sh.vertexShader = sh.vertexShader
       .replace("#include <common>", "#include <common>\nvarying float vAlturaCima;")

@@ -6,7 +6,7 @@ import * as THREE from "three";
 // (porcelana), implante (titânio cor de champanhe).
 
 // relevo fino por ruído, na posição do objeto (sem textura baixada)
-function relevo<T extends THREE.Material>(m: T, frequencia: number, forca: number, chave: string): T {
+function relevo<T extends THREE.Material>(m: T, frequencia: number, forca: number): T {
   m.onBeforeCompile = (sh) => {
     sh.uniforms.uRelevo = { value: new THREE.Vector2(frequencia, forca) };
     sh.vertexShader = sh.vertexShader
@@ -36,7 +36,8 @@ float ruido3(vec3 p) {
 }`,
       );
   };
-  m.customProgramCacheKey = () => `relevo-${chave}-${frequencia}-${forca}`;
+  // a frequência e a força são uniforms: o programa é o mesmo em todos os materiais com relevo
+  m.customProgramCacheKey = () => "relevo";
   return m;
 }
 
@@ -55,7 +56,6 @@ export const esmalte = (leve = false, frequencia = 2.2, forca = 0.09) =>
     }),
     frequencia,
     forca,
-    "esmalte",
   );
 
 export const dentina = () =>
@@ -84,7 +84,6 @@ export const gengiva = () =>
     }),
     3.4,
     0.16,
-    "gengiva",
   );
 
 // cores da gengiva (as mesmas em todas as cenas): perto do dente um pouco mais clara, embaixo mais funda
@@ -153,7 +152,6 @@ export const porcelana = () =>
     }),
     2.2,
     0.05,
-    "porcelana",
   );
 
 export const titanio = () =>

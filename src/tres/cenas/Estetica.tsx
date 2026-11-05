@@ -11,6 +11,8 @@ import { FILMES, janela, mix, sobe, trecho } from "../filme";
 import { esmalte, porcelana } from "../materiais";
 import { AMOSTRAS_PERFIL, CAMADAS, CONTORNO, ehCurto, ehEscuro, vagasEstetica } from "../oficina/estetica";
 import { uma, useFormas, varias } from "../oficina/usaFormas";
+import { Preparo } from "../Preparo";
+import { ehToque, useCenaPronta } from "@/lib/tres";
 
 // T2 · Estética do sorriso. Os seis dentes da frente de cima, de frente, com a câmera na altura das bordas.
 // O central da esquerda (na tela) está escuro e lascado; o lateral da direita está curto.
@@ -40,6 +42,9 @@ const COMBINA = 1; // a plaqueta que combina com os vizinhos
 const DENTINA = "#d7c8ad"; // L* ~81, b* ~15: quente e fosca, sem cara de ouro
 const ESMALTE_SEPARADO = "#f3f4f1"; // enquanto separado, um branco neutro, mais claro que o dente (o azul é só da borda)
 type Linha2 = ComponentRef<typeof Line>;
+// o lado da textura de cada lupa, multiplicado pela densidade da tela: no celular, a lupa é pequena e a tela tem o
+// dobro de pixels (com 640, seriam duas texturas de 1280, com antisserrilhado, sem ganho nenhum na imagem)
+const LADO_LUPA = ehToque() ? 320 : 640;
 
 // o fundo das lupas: o rebaixo no reboco, com a sombra por dentro no alto à esquerda e um fio de luz embaixo
 function texturaDaLupa() {
@@ -203,7 +208,7 @@ function Lupa({
       <mesh renderOrder={20}>
         <circleGeometry args={[raio, 96]} />
         <meshBasicMaterial ref={disco} transparent depthTest={false} toneMapped>
-          <RenderTexture attach="map" width={640} height={640} samples={4} frames={ligada ? Infinity : 0}>
+          <RenderTexture attach="map" width={LADO_LUPA} height={LADO_LUPA} samples={4} frames={ligada ? Infinity : 0}>
             {children}
           </RenderTexture>
         </meshBasicMaterial>
@@ -216,7 +221,8 @@ function Lupa({
 }
 
 export function CenaEstetica({ p: fixo }: { p?: number }) {
-  const formas = useFormas("estetica", "estetica");
+  const formas = useFormas("estetica");
+  const preparada = useCenaPronta("estetica");
   const vagas = useMemo(vagasEstetica, []);
   const escuro = useMemo(() => vagas.find(ehEscuro)!, [vagas]);
   const curto = useMemo(() => vagas.find(ehCurto)!, [vagas]);
@@ -387,7 +393,8 @@ export function CenaEstetica({ p: fixo }: { p?: number }) {
     const l2 = janela(p, P.lupa2[0], P.lupa2[1], P.lupa2[2], P.lupa2[3]);
     // cada lupa liga um pouco antes de aparecer (a cena dela já está desenhada quando o disco surge) e só
     // aparece depois de dois quadros ligada: num salto da rolagem, o disco não mostra a textura ainda vazia
-    const precisa = [p > P.lupa[0] - 0.05 && p < P.lupa[3] + 0.01, p > P.lupa2[0] - 0.05 && p < P.lupa2[3] + 0.01];
+    // (antes de a cena estar preparada, nenhuma liga: desenhar agora pararia a página)
+    const precisa = [preparada && p > P.lupa[0] - 0.05 && p < P.lupa[3] + 0.01, preparada && p > P.lupa2[0] - 0.05 && p < P.lupa2[3] + 0.01];
     if (precisa[0] !== ligadas[0] || precisa[1] !== ligadas[1]) setLigadas(precisa);
     let falta = false;
     (
@@ -518,6 +525,7 @@ export function CenaEstetica({ p: fixo }: { p?: number }) {
             <mesh geometry={uma(formas, "lupaFaceta")!} material={corte.faceta} />
           </group>
         </group>
+        <Preparo naTextura />
       </>
     ) : null;
 
@@ -529,6 +537,7 @@ export function CenaEstetica({ p: fixo }: { p?: number }) {
       <color attach="background" args={["#e8e2d6"]} />
       <Ambiente parede={null} rebatida={0.5} />
       {sorriso(1)}
+      <Preparo naTextura />
     </>
   ) : null;
 
@@ -592,6 +601,7 @@ export function CenaEstetica({ p: fixo }: { p?: number }) {
           ))}
         </group>
       </group>
+      <Preparo id="estetica" />
     </>
   );
 }

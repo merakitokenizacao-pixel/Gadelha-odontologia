@@ -1,22 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { COPY } from "@/lib/conteudo";
+import { useToque } from "@/lib/tres";
 import { FILMES } from "@/tres/filme";
 
-// As etiquetas dos filmes ficam numa camada própria, presa à janela e acima da tela 3D (dentro do trilho,
-// que anda por transform, elas ficavam por baixo do desenho). A cada quadro, enquanto a vitrine está à
-// vista, cada etiqueta vai para o seu ponto na caixa do desenho e acende na sua fase do filme.
+// As etiquetas dos filmes. No computador, numa camada própria presa à janela e acima da tela 3D (dentro do
+// trilho, que anda por transform, elas ficavam por baixo do desenho): a cada quadro, enquanto a vitrine está à
+// vista, cada etiqueta vai para o seu ponto na caixa do desenho. No celular e no tablet, a tela 3D é uma peça
+// da página: a etiqueta fica dentro da caixa, e o dedo leva as duas juntas. Nos dois, ela acende na sua fase do
+// filme.
 export function Etiquetas() {
-  const [alvo, setAlvo] = useState<HTMLElement | null>(null);
-  const caixa = useRef<HTMLDivElement>(null);
+  const toque = useToque();
+  const [montado, setMontado] = useState(false);
 
-  useEffect(() => setAlvo(document.body), []);
+  useEffect(() => setMontado(true), []);
 
   useEffect(() => {
-    if (!alvo || !caixa.current) return;
-    const dados = [...caixa.current.querySelectorAll<HTMLElement>(".etiqueta")].map((el) => ({
+    if (!montado) return;
+    const dados = [...document.querySelectorAll<HTMLElement>(".etiqueta")].map((el) => ({
       el,
       id: el.dataset.id!,
       x: Number(el.dataset.x),
@@ -38,9 +41,11 @@ export function Etiquetas() {
           if (d.el.style.opacity !== "0") d.el.style.opacity = "0";
           continue;
         }
-        const r = d.arte.getBoundingClientRect();
         d.el.style.opacity = op.toFixed(3);
-        d.el.style.transform = `translate(${(r.left + r.width * d.x).toFixed(1)}px, ${(r.top + r.height * d.y).toFixed(1)}px) translate(-50%, -50%)`;
+        if (!toque) {
+          const r = d.arte.getBoundingClientRect();
+          d.el.style.transform = `translate(${(r.left + r.width * d.x).toFixed(1)}px, ${(r.top + r.height * d.y).toFixed(1)}px) translate(-50%, -50%)`;
+        }
       }
       if (vivo) quadro = requestAnimationFrame(passo);
     };
@@ -55,27 +60,40 @@ export function Etiquetas() {
       olho.disconnect();
       cancelAnimationFrame(quadro);
     };
-  }, [alvo]);
+  }, [montado, toque]);
 
-  if (!alvo) return null;
+  if (!montado) return null;
+  const lista = COPY.tratamentos.lista;
+  const dele = (t: (typeof lista)[number]) =>
+    (t.etiquetas ?? []).map((e) => (
+      <span
+        key={`${t.id}-${e.texto}`}
+        className="etiqueta"
+        data-id={t.id}
+        data-x={parseFloat(e.x) / 100}
+        data-y={parseFloat(e.y) / 100}
+        data-de={e.de}
+        data-ate={e.ate}
+        style={toque ? { left: e.x, top: e.y, transform: "translate(-50%, -50%)", zIndex: 2 } : undefined}
+      >
+        {e.texto}
+      </span>
+    ));
+
+  if (toque) {
+    return (
+      <>
+        {lista.map((t) => {
+          const arte = document.querySelector(`#trat-${t.id} .trat__arte`);
+          return arte ? createPortal(dele(t), arte, t.id) : null;
+        })}
+      </>
+    );
+  }
   return createPortal(
-    <div className="etiquetas" ref={caixa} aria-hidden="true">
-      {COPY.tratamentos.lista.flatMap((t) =>
-        (t.etiquetas ?? []).map((e) => (
-          <span
-            key={`${t.id}-${e.texto}`}
-            className="etiqueta"
-            data-id={t.id}
-            data-x={parseFloat(e.x) / 100}
-            data-y={parseFloat(e.y) / 100}
-            data-de={e.de}
-            data-ate={e.ate}
-          >
-            {e.texto}
-          </span>
-        )),
-      )}
+    <div className="etiquetas" aria-hidden="true">
+      {lista.flatMap(dele)}
     </div>,
-    alvo,
+    document.body,
   );
 }

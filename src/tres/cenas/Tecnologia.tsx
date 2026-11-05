@@ -10,6 +10,7 @@ import { FILMES, mix, sobe, trecho } from "../filme";
 import { esmalte, gengiva } from "../materiais";
 import { tortoDe, vagasTecnologia } from "../oficina/tecnologia";
 import { uma, useFormas, varias } from "../oficina/usaFormas";
+import { Preparo } from "../Preparo";
 
 // T5 · O planejamento digital, nos cartões do painel azul. Laços curtos, que tocam só depois que a linha
 // de luz do painel passa pelo cartão e enquanto ele está à vista.
@@ -94,7 +95,7 @@ const K_ARCADA = 0.052; // a mesma parábola da arcada (z = -k·x²)
 
 // ---------- 1) escaneamento ----------
 export function CenaEscaneamento({ p: fixo }: { p?: number }) {
-  const formas = useFormas("tec-escaneamento", "escaneamento");
+  const formas = useFormas("tec-escaneamento");
   const vagas = useMemo(vagasTecnologia, []);
   // os dois lados do corte: à frente do escâner o esmalte (x > corte), atrás dele o modelo digital
   const plano = useMemo(() => ({ esmalte: new THREE.Plane(new THREE.Vector3(1, 0, 0), 40), malha: new THREE.Plane(new THREE.Vector3(-1, 0, 0), -40) }), []);
@@ -121,6 +122,7 @@ export function CenaEscaneamento({ p: fixo }: { p?: number }) {
     return s;
   }, []);
   const escaner = useRef<THREE.Group>(null);
+  const pecas = useRef<THREE.Group>(null);
 
   useFrame(() => {
     const p = fixo ?? FILMES.escaneamento.p;
@@ -143,7 +145,11 @@ export function CenaEscaneamento({ p: fixo }: { p?: number }) {
     if (escaner.current) {
       // a ponteira não passa do último molar (≈ ±24): a linha de luz termina sozinha a ponta da gengiva
       const xe = Math.max(-25, Math.min(25, xs));
-      escaner.current.visible = p > 0 && p < 0.92;
+      // a luz da janela fica sempre na cena, apagada quando a ponteira sai: tirá-la trocaria os materiais de
+      // programa no meio do laço, e a página parava para prepará-los
+      const naTela = p > 0 && p < 0.92;
+      if (pecas.current) pecas.current.visible = naTela;
+      janela.intensity = naTela ? 2.6 : 0;
       escaner.current.position.set(xe - 48 * entra + 48 * sai, 13.2, -K_ARCADA * xe * xe);
       escaner.current.rotation.set(0, 0.4 * Math.atan(2 * K_ARCADA * xe), 0);
     }
@@ -165,28 +171,31 @@ export function CenaEscaneamento({ p: fixo }: { p?: number }) {
           ))}
           {/* a ponteira do escâner: a cabeça fina, inclinada uns 20°, com a janela embaixo da ponta, e o corpo
               que engrossa saindo para fora da arcada */}
-          <group ref={escaner} visible={false}>
+          <group ref={escaner}>
             <group rotation={[-0.35, 0, 0]}>
-              <RoundedBox args={[4.6, 2, 12]} radius={0.9} smoothness={4} position={[0, 0, 4]} material={mat.casco} />
-              <mesh position={[0, -1.02, 0]} material={mat.vidro}>
-                <boxGeometry args={[3, 0.1, 4.2]} />
-              </mesh>
-              <mesh position={[0, 6.6, 20.6]} rotation={[1.1, 0, 0]} material={mat.casco}>
-                <cylinderGeometry args={[2.8, 1.8, 24, 28]} />
-              </mesh>
+              <group ref={pecas} visible={false}>
+                <RoundedBox args={[4.6, 2, 12]} radius={0.9} smoothness={4} position={[0, 0, 4]} material={mat.casco} />
+                <mesh position={[0, -1.02, 0]} material={mat.vidro}>
+                  <boxGeometry args={[3, 0.1, 4.2]} />
+                </mesh>
+                <mesh position={[0, 6.6, 20.6]} rotation={[1.1, 0, 0]} material={mat.casco}>
+                  <cylinderGeometry args={[2.8, 1.8, 24, 28]} />
+                </mesh>
+              </group>
               <primitive object={janela} />
               <primitive object={janela.target} />
             </group>
           </group>
         </group>
       ) : null}
+      {formas ? <Preparo id="escaneamento" /> : null}
     </>
   );
 }
 
 // ---------- 2) simulação ----------
 export function CenaSimulacao({ p: fixo }: { p?: number }) {
-  const formas = useFormas("tec-simulacao", "simulacao");
+  const formas = useFormas("tec-simulacao");
   const vagas = useMemo(vagasTecnologia, []);
   // dois tons, como nos programas de planejamento: os dentes mais claros, a gengiva mais escura
   const some = useMemo(() => ({ value: 1 }), []);
@@ -263,6 +272,7 @@ export function CenaSimulacao({ p: fixo }: { p?: number }) {
           ))}
         </group>
       ) : null}
+      {formas && gengivaMalha ? <Preparo id="simulacao" /> : null}
     </>
   );
 }

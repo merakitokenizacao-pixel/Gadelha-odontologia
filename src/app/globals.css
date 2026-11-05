@@ -136,10 +136,11 @@ h3 {
   inset: 0;
   z-index: 70;
   pointer-events: none;
-  /* 0,1: o grão quebra os anéis do degradê do fundo nas telas boas */
-  opacity: 0.1;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.42  0 0 0 0 0.36  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+  /* o grão quebra os anéis do degradê do fundo nas telas boas. Preto a 3,3% dá a mesma conta da antiga
+     multiplicação do tom cáqui a 10%, sem obrigar a placa a misturar a página inteira a cada quadro (o filtro
+     trabalha em cor linear: aquele cáqui, na tela, era claro, por volta de 0,68) */
+  opacity: 0.033;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
 }
 
 /* ---------- tipografia ---------- */
@@ -313,15 +314,14 @@ h3 {
   transition: background-color 0.35s var(--curva), box-shadow 0.35s var(--curva), color 0.35s var(--curva);
 }
 
+/* opaco, sem desfoque por trás: com 94% de cor, o desfoque mal aparecia, e a placa o refazia a cada quadro */
 .topo.rolou {
-  background: rgba(246, 242, 234, 0.94);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  background: rgb(246, 242, 234);
   box-shadow: 0 1px 0 var(--linha);
 }
 
 .topo.rolou.topo--escuro {
-  background: rgba(24, 29, 69, 0.95);
+  background: rgb(24, 29, 69);
   box-shadow: 0 1px 0 var(--linha-tinta);
   color: var(--sobre-tinta);
 }

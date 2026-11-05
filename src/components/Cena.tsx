@@ -2,12 +2,14 @@
 
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import { useCenaPronta, useTresLiberado } from "@/lib/tres";
+import { useCenaPerto, useCenaPronta, useTresLiberado, useToque } from "@/lib/tres";
 
 // O desenho de um filme: embaixo, o pôster renderizado antes (aparece até a cena estar pronta e acesa, e
 // sempre para quem pede menos movimento, num quadro próprio se "calmo"); por cima, a cena 3D, carregada só
-// quando o 3D é liberado.
+// quando o 3D é liberado. No computador, ela entra na tela única da página; no celular e no tablet, tem a
+// própria tela, dentro desta caixa, e só existe enquanto o cartão está perto da tela.
 const Cena3D = dynamic(() => import("@/tres/Cenas3D").then((m) => m.Cena3D), { ssr: false });
+const CenaToque = dynamic(() => import("@/tres/CenaToque").then((m) => m.CenaToque), { ssr: false });
 
 // poster={false}: sem pôster (na impressão, a foto da clínica fica no cartão, por baixo).
 export function Cena({
@@ -24,6 +26,8 @@ export function Cena({
   poster?: boolean;
 }) {
   const liberado = useTresLiberado();
+  const toque = useToque();
+  const perto = useCenaPerto(id);
   const pronta = useCenaPronta(id);
   const [semPoster, setSemPoster] = useState(false);
   return (
@@ -44,7 +48,11 @@ export function Cena({
           onError={() => setSemPoster(true)}
         />
       )}
-      {liberado ? <Cena3D id={id} className={className} visivel={visivel} /> : null}
+      {!liberado ? null : !toque ? (
+        <Cena3D id={id} className={className} visivel={visivel} />
+      ) : perto ? (
+        <CenaToque id={id} className={className} visivel={visivel} />
+      ) : null}
     </>
   );
 }
